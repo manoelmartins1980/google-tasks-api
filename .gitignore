@@ -9,3 +9,4 @@ secrets/*
 *.bak
 .vscode/
 .idea/
+logs/
