@@ -21,11 +21,19 @@ python -m scripts.authorize            # abre o navegador, grava secrets/token.j
 
 ## Rodar
 
+Uso diário — inicia sozinha no login do Windows (tarefa agendada `google-tasks-api`, sem console):
+
 ```powershell
-python run.py
+.\scripts\install-autostart.ps1           # instala e inicia agora (-Remove para desinstalar)
+Start-ScheduledTask google-tasks-api      # reiniciar manualmente
 ```
 
+Log em `logs/api.log`. Desenvolvimento (com reload): `python run.py`.
+
 Docs interativas: http://127.0.0.1:8001/docs (botão *Authorize* → informar a `X-API-Key`).
+`GET /health` não exige chave (monitoramento).
+
+Pelo assistente: [_assistente/gtasks/](../../../_assistente/gtasks/README.md) (CLI `gtasks.py`).
 
 ## Endpoints
 
@@ -56,7 +64,7 @@ app/
   security.py       # X-API-Key
   schemas.py        # modelos de entrada
   routers/          # tasklists.py, tasks.py
-scripts/authorize.py
+scripts/          # authorize.py, serve.py (uso diário), install-autostart.ps1
 secrets/            # credentials.json, token.json (não versionar)
 ```
 
