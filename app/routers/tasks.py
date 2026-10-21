@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query, Response
+from pydantic import BaseModel
 
 from ..google_client import tasks_service
 from ..schemas import TaskIn, TaskMove, TaskPatch, due_to_rfc3339
@@ -6,7 +7,7 @@ from ..schemas import TaskIn, TaskMove, TaskPatch, due_to_rfc3339
 router = APIRouter(prefix="/tasklists/{tasklist_id}/tasks", tags=["tarefas"])
 
 
-def _body(model, exclude: set[str] = set()) -> dict:
+def _body(model: BaseModel, exclude: frozenset[str] = frozenset()) -> dict:
     data = model.model_dump(exclude_unset=True, exclude=exclude)
     if data.get("due"):
         data["due"] = due_to_rfc3339(data["due"])
@@ -26,15 +27,19 @@ def list_tasks(
 ):
     items, token = [], None
     while True:
-        res = svc.tasks().list(
-            tasklist=tasklist_id,
-            maxResults=100,
-            pageToken=token,
-            showCompleted=show_completed,
-            showHidden=show_hidden,
-            dueMin=due_min,
-            dueMax=due_max,
-        ).execute()
+        res = (
+            svc.tasks()
+            .list(
+                tasklist=tasklist_id,
+                maxResults=100,
+                pageToken=token,
+                showCompleted=show_completed,
+                showHidden=show_hidden,
+                dueMin=due_min,
+                dueMax=due_max,
+            )
+            .execute()
+        )
         items += res.get("items", [])
         token = res.get("nextPageToken")
         if not token:
@@ -43,12 +48,16 @@ def list_tasks(
 
 @router.post("", status_code=201)
 def create_task(tasklist_id: str, body: TaskIn, svc=Depends(tasks_service)):
-    return svc.tasks().insert(
-        tasklist=tasklist_id,
-        parent=body.parent,
-        previous=body.previous,
-        body=_body(body, exclude={"parent", "previous"}),
-    ).execute()
+    return (
+        svc.tasks()
+        .insert(
+            tasklist=tasklist_id,
+            parent=body.parent,
+            previous=body.previous,
+            body=_body(body, exclude={"parent", "previous"}),
+        )
+        .execute()
+    )
 
 
 @router.get("/{task_id}")
@@ -63,20 +72,26 @@ def update_task(tasklist_id: str, task_id: str, body: TaskPatch, svc=Depends(tas
 
 @router.post("/{task_id}/complete")
 def complete_task(tasklist_id: str, task_id: str, svc=Depends(tasks_service)):
-    return svc.tasks().patch(
-        tasklist=tasklist_id, task=task_id, body={"status": "completed"}
-    ).execute()
+    return (
+        svc.tasks()
+        .patch(tasklist=tasklist_id, task=task_id, body={"status": "completed"})
+        .execute()
+    )
 
 
 @router.post("/{task_id}/move")
 def move_task(tasklist_id: str, task_id: str, body: TaskMove, svc=Depends(tasks_service)):
-    return svc.tasks().move(
-        tasklist=tasklist_id,
-        task=task_id,
-        parent=body.parent,
-        previous=body.previous,
-        destinationTasklist=body.destination_tasklist,
-    ).execute()
+    return (
+        svc.tasks()
+        .move(
+            tasklist=tasklist_id,
+            task=task_id,
+            parent=body.parent,
+            previous=body.previous,
+            destinationTasklist=body.destination_tasklist,
+        )
+        .execute()
+    )
 
 
 @router.delete("/{task_id}", status_code=204)

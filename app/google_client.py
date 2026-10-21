@@ -12,9 +12,7 @@ from .config import SCOPES, settings
 
 def run_oauth_flow() -> Credentials:
     """Abre o navegador para autorizar a conta Google e salva o token."""
-    flow = InstalledAppFlow.from_client_secrets_file(
-        str(settings.google_credentials_file), SCOPES
-    )
+    flow = InstalledAppFlow.from_client_secrets_file(str(settings.google_credentials_file), SCOPES)
     creds = flow.run_local_server(port=0)
     _save(creds)
     return creds
@@ -23,9 +21,7 @@ def run_oauth_flow() -> Credentials:
 def load_credentials() -> Credentials:
     token_file = settings.google_token_file
     if not token_file.exists():
-        raise RuntimeError(
-            "Token não encontrado. Rode `python -m scripts.authorize` primeiro."
-        )
+        raise RuntimeError("Token não encontrado. Rode `python -m scripts.authorize` primeiro.")
     creds = Credentials.from_authorized_user_file(str(token_file), SCOPES)
     if not creds.valid:
         if creds.expired and creds.refresh_token:

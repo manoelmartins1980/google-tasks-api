@@ -9,7 +9,7 @@ from .security import require_api_key
 
 app = FastAPI(
     title="Google Tasks API",
-    version="0.1.0",
+    version="1.0.0",
     description="Criação e manipulação de listas e tarefas do Google Tasks.",
 )
 # X-API-Key só nas rotas de dados; /health fica aberto para monitoramento.
