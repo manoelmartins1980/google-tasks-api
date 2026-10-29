@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from ..google_client import tasks_service
 from ..schemas import TaskIn, TaskMove, TaskPatch, due_to_rfc3339
 
-router = APIRouter(prefix="/tasklists/{tasklist_id}/tasks", tags=["tarefas"])
+router = APIRouter(prefix="/tasklists/{tasklist_id}/tasks", tags=["tasks"])
 
 
 def _body(model: BaseModel, exclude: frozenset[str] = frozenset()) -> dict:
@@ -12,7 +12,7 @@ def _body(model: BaseModel, exclude: frozenset[str] = frozenset()) -> dict:
     if data.get("due"):
         data["due"] = due_to_rfc3339(data["due"])
     if data.get("status") == "needsAction":
-        data["completed"] = None  # reabrir tarefa
+        data["completed"] = None  # reopen the task
     return data
 
 
@@ -100,8 +100,8 @@ def delete_task(tasklist_id: str, task_id: str, svc=Depends(tasks_service)):
     return Response(status_code=204)
 
 
-@router.post("/clear", status_code=204, tags=["listas"])
+@router.post("/clear", status_code=204, tags=["lists"])
 def clear_completed(tasklist_id: str, svc=Depends(tasks_service)):
-    """Oculta todas as tarefas concluídas da lista."""
+    """Hide all completed tasks in the list."""
     svc.tasks().clear(tasklist=tasklist_id).execute()
     return Response(status_code=204)

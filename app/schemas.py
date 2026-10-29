@@ -11,9 +11,9 @@ class TaskListIn(BaseModel):
 class TaskIn(BaseModel):
     title: str = Field(min_length=1, max_length=1024)
     notes: str | None = None
-    due: date | None = Field(None, description="Google Tasks só guarda a data, não a hora.")
-    parent: str | None = Field(None, description="ID da tarefa-pai (subtarefa).")
-    previous: str | None = Field(None, description="ID da tarefa irmã anterior (ordem).")
+    due: date | None = Field(None, description="Date only: the Google Tasks API discards the time.")
+    parent: str | None = Field(None, description="Parent task ID (subtask).")
+    previous: str | None = Field(None, description="Previous sibling task ID (ordering).")
 
 
 class TaskPatch(BaseModel):
@@ -26,7 +26,7 @@ class TaskPatch(BaseModel):
 class TaskMove(BaseModel):
     parent: str | None = None
     previous: str | None = None
-    destination_tasklist: str | None = Field(None, description="Mover para outra lista.")
+    destination_tasklist: str | None = Field(None, description="Move to another task list.")
 
 
 def due_to_rfc3339(d: date) -> str:

@@ -12,12 +12,12 @@ from app.main import app
 
 KEY = "segredo-teste"
 client = TestClient(app, headers={"X-API-Key": KEY})
-anon = TestClient(app)  # sem chave
+anon = TestClient(app)  # no key
 
 
 @pytest.fixture(autouse=True)
 def svc(monkeypatch):
-    """Client Google falso, novo a cada teste; API_KEY configurada."""
+    """Fake Google client, fresh for each test; API_KEY configured."""
     mock = MagicMock()
     app.dependency_overrides[tasks_service] = lambda: mock
     monkeypatch.setattr(settings, "api_key", KEY)
@@ -50,11 +50,11 @@ def test_list_tasklists_paginates(svc):
 
 
 def test_create_tasklist(svc):
-    svc.tasklists().insert().execute.return_value = {"id": "L1", "title": "Casa"}
-    r = client.post("/tasklists", json={"title": "Casa"})
+    svc.tasklists().insert().execute.return_value = {"id": "L1", "title": "Home"}
+    r = client.post("/tasklists", json={"title": "Home"})
     assert r.status_code == 201
     assert r.json()["id"] == "L1"
-    assert svc.tasklists().insert.call_args.kwargs["body"] == {"title": "Casa"}
+    assert svc.tasklists().insert.call_args.kwargs["body"] == {"title": "Home"}
 
 
 def test_get_tasklist(svc):
@@ -64,9 +64,12 @@ def test_get_tasklist(svc):
 
 
 def test_rename_tasklist(svc):
-    svc.tasklists().patch().execute.return_value = {"id": "L1", "title": "Novo"}
-    assert client.patch("/tasklists/L1", json={"title": "Novo"}).status_code == 200
-    assert svc.tasklists().patch.call_args.kwargs == {"tasklist": "L1", "body": {"title": "Novo"}}
+    svc.tasklists().patch().execute.return_value = {"id": "L1", "title": "Renamed"}
+    assert client.patch("/tasklists/L1", json={"title": "Renamed"}).status_code == 200
+    assert svc.tasklists().patch.call_args.kwargs == {
+        "tasklist": "L1",
+        "body": {"title": "Renamed"},
+    }
 
 
 def test_delete_tasklist(svc):
@@ -103,10 +106,10 @@ def test_list_tasks_passes_filters_and_paginates(svc):
 
 def test_create_task_converts_due_date(svc):
     svc.tasks().insert().execute.return_value = {"id": "t1"}
-    r = client.post("/tasklists/L1/tasks", json={"title": "Comprar pão", "due": "2026-10-22"})
+    r = client.post("/tasklists/L1/tasks", json={"title": "Buy bread", "due": "2026-10-22"})
     assert r.status_code == 201
     kwargs = svc.tasks().insert.call_args.kwargs
-    assert kwargs["body"] == {"title": "Comprar pão", "due": "2026-10-22T00:00:00.000Z"}
+    assert kwargs["body"] == {"title": "Buy bread", "due": "2026-10-22T00:00:00.000Z"}
     assert kwargs["tasklist"] == "L1"
 
 
@@ -125,8 +128,8 @@ def test_get_task(svc):
 
 
 def test_update_task_sends_only_given_fields(svc):
-    client.patch("/tasklists/L1/tasks/t1", json={"notes": "obs"})
-    assert svc.tasks().patch.call_args.kwargs["body"] == {"notes": "obs"}
+    client.patch("/tasklists/L1/tasks/t1", json={"notes": "note"})
+    assert svc.tasks().patch.call_args.kwargs["body"] == {"notes": "note"}
 
 
 def test_reopen_task_clears_completed(svc):
@@ -181,7 +184,7 @@ def test_health_is_open_without_key():
 
 
 def test_wrong_api_key_returns_401():
-    assert anon.get("/tasklists", headers={"X-API-Key": "errada"}).status_code == 401
+    assert anon.get("/tasklists", headers={"X-API-Key": "wrong"}).status_code == 401
 
 
 def test_valid_api_key_passes(svc):
@@ -210,13 +213,13 @@ def test_google_404_on_tasklist(svc):
 
 
 def test_missing_token_returns_503(svc):
-    svc.tasklists().list().execute.side_effect = RuntimeError("Token não encontrado.")
+    svc.tasklists().list().execute.side_effect = RuntimeError("Token not found.")
     r = client.get("/tasklists")
     assert r.status_code == 503
     assert "Token" in r.json()["detail"]
 
 
-@pytest.mark.parametrize("due", ["2026-13-01", "22/10/2026", "amanhã"])
+@pytest.mark.parametrize("due", ["2026-13-01", "22/10/2026", "tomorrow"])
 def test_invalid_due_returns_422(svc, due):
     r = client.post("/tasklists/L1/tasks", json={"title": "X", "due": due})
     assert r.status_code == 422

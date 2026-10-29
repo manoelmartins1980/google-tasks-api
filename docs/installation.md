@@ -79,7 +79,7 @@ python -m scripts.authorize
 
 1. The browser opens on Google's sign-in page. If it doesn't, look for a new tab behind other windows.
 2. Choose the account whose Tasks you want to manage and click **Allow**.
-3. The page shows *"The authentication flow has completed"*, and the console prints `Token salvo em ...\secrets\token.json`.
+3. The page shows *"The authentication flow has completed"*, and the console prints `Token saved to ...\secrets\token.json`.
 
 > **`ERR_CONNECTION_REFUSED` on `localhost:<port>/?...&code=...`** means you approved after the script
 > had stopped listening. Nothing is broken: run `python -m scripts.authorize` again and approve right away.

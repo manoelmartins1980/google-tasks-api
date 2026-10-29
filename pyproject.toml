@@ -1,12 +1,12 @@
 [project]
 name = "google-tasks-api"
-version = "1.0.0"
+version = "1.0.1"
 description = "Small FastAPI service in front of the Google Tasks API: one OAuth token, one API key, plain HTTP."
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Manoel Martins" }]
 requires-python = ">=3.12"
-# Dependências fixadas em requirements.txt (gerado a partir de requirements.in)
+# Pinned dependencies live in requirements.txt (generated from requirements.in)
 
 [tool.ruff]
 line-length = 100
@@ -14,10 +14,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
-ignore = ["B008"]  # Depends()/Security() em defaults é o padrão do FastAPI
+ignore = ["B008"]  # Depends()/Security() in defaults is the FastAPI idiom
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "S105"]  # assert e chaves falsas são esperados em testes
+"tests/*" = ["S101", "S105"]  # asserts and fake keys are expected in tests
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

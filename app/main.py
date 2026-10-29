@@ -9,10 +9,10 @@ from .security import require_api_key
 
 app = FastAPI(
     title="Google Tasks API",
-    version="1.0.0",
-    description="Criação e manipulação de listas e tarefas do Google Tasks.",
+    version="1.0.1",
+    description="Create and manage Google Tasks task lists and tasks.",
 )
-# X-API-Key só nas rotas de dados; /health fica aberto para monitoramento.
+# X-API-Key only on data routes; /health stays open for monitoring.
 app.include_router(tasklists.router, dependencies=[Depends(require_api_key)])
 app.include_router(tasks.router, dependencies=[Depends(require_api_key)])
 

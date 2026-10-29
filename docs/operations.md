@@ -65,8 +65,8 @@ Behaviors worth knowing:
 | `401` | missing or wrong `X-API-Key` | check the header against `.env` |
 | `422` | invalid input (e.g. `due` not `YYYY-MM-DD`, empty title) | fix the request; nothing was sent to Google |
 | `400` / `404` | forwarded from Google: malformed ID (`400`) or not found (`404`) | check the IDs; the `detail` is Google's message |
-| `503` `API_KEY não configurada` | `API_KEY` empty in `.env` | set it and restart |
-| `503` `Token não encontrado` / `Token inválido` | no token, or it can't be refreshed | run `python -m scripts.authorize` |
+| `503` `API_KEY is not configured` | `API_KEY` empty in `.env` | set it and restart |
+| `503` `Token not found` / `Invalid token` | no token, or it can't be refreshed | run `python -m scripts.authorize` |
 
 ## Token lifecycle
 

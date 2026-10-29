@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Response
 from ..google_client import tasks_service
 from ..schemas import TaskListIn
 
-router = APIRouter(prefix="/tasklists", tags=["listas"])
+router = APIRouter(prefix="/tasklists", tags=["lists"])
 
 
 @router.get("")

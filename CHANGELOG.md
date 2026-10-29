@@ -3,6 +3,14 @@
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] — 2026-10-29
+
+### Changed
+- All user-facing text is now in English: error messages (`401`, `503`), the OpenAPI
+  description and tags shown in `/docs`, script output, comments and docstrings.
+  Clients that matched the old Portuguese `detail` strings must use the new ones
+  (see `docs/operations.md`).
+
 ## [1.0.0] — 2026-10-21
 
 ### Added
